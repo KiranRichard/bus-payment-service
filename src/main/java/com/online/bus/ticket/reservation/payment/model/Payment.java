@@ -17,7 +17,7 @@ public class Payment {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private long paymentId;
-    private long bookingDetailsId;
+    private long bookingId;
     private double amount;
     private String paymentStatus;
     private LocalDateTime paymentDateTime;

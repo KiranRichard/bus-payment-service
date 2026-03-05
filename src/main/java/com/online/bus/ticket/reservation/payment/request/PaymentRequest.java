@@ -7,7 +7,7 @@ import java.time.LocalDateTime;
 @Data
 public class PaymentRequest {
 
-    private long bookingDetailsId;
+    private long bookingId;
     private double amount;
     private String paymentStatus;
     private LocalDateTime paymentDateTime;

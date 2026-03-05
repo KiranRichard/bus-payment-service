@@ -1,0 +1,17 @@
+package com.online.bus.ticket.reservation.payment.enums;
+
+public enum BookingStatus {
+
+    PENDING, CANCELLED, CONFIRMED, REFUNDED, COMPLETED, ONBOARDED, PAID;
+
+    public static BookingStatus findByName(String name) {
+        BookingStatus bookingStatus = null;
+        for (BookingStatus bookingStatusValue : values()) {
+            if (bookingStatusValue.name().equalsIgnoreCase(name)) {
+                bookingStatus = bookingStatusValue;
+                break;
+            }
+        }
+        return bookingStatus;
+    }
+}

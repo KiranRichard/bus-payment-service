@@ -7,5 +7,5 @@ import java.util.Optional;
 
 public interface PaymentRepository extends CrudRepository<Payment, Long> {
 
-    Optional<Payment> findByBookingDetailsId(long bookingDetailsId);
+    Optional<Payment> findByBookingId(long bookingId);
 }

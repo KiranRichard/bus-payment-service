@@ -1,6 +1,6 @@
 package com.online.bus.ticket.reservation.payment.validator;
 
-import com.online.bus.ticket.reservation.payment.enums.PaymentStatus;
+import com.online.bus.ticket.reservation.payment.enums.BookingStatus;
 import com.online.bus.ticket.reservation.payment.exception.RequiredFieldsMissingException;
 import com.online.bus.ticket.reservation.payment.request.PaymentRequest;
 import io.micrometer.common.util.StringUtils;
@@ -19,7 +19,7 @@ public class PaymentValidator {
             throw new RequiredFieldsMissingException("Invalid - payment request is null");
         }
 
-        if(paymentRequest.getBookingDetailsId()<=0) {
+        if(paymentRequest.getBookingId()<=0) {
             log.info("[Error]: Invalid booking id is null in payment request");
             throw new RequiredFieldsMissingException("Invalid booking id is null in payment request");
         }
@@ -29,7 +29,7 @@ public class PaymentValidator {
             throw new RequiredFieldsMissingException("Invalid amount is null in payment request");
         }
 
-        if(StringUtils.isBlank(paymentRequest.getPaymentStatus()) || Objects.isNull(PaymentStatus.findByName(paymentRequest.getPaymentStatus()))) {
+        if(StringUtils.isBlank(paymentRequest.getPaymentStatus()) || Objects.isNull(BookingStatus.findByName(paymentRequest.getPaymentStatus()))) {
             log.info("[Error]: Invalid payment status is null in payment request");
             throw new RequiredFieldsMissingException("Invalid payment status is null in payment request");
         }
@@ -42,10 +42,10 @@ public class PaymentValidator {
         }
     }
 
-    public void validateBookingDetailsId(long bookingDetailsId) {
-        if(bookingDetailsId<=0) {
-            log.info("[Error]: Invalid - booking details Id is null");
-            throw new RequiredFieldsMissingException("Invalid - booking details Id is null");
+    public void validateBookingId(long bookingId) {
+        if(bookingId<=0) {
+            log.info("[Error]: Invalid - booking Id is null");
+            throw new RequiredFieldsMissingException("Invalid - booking Id is null");
         }
     }
 }

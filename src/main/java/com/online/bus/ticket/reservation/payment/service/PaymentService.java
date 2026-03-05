@@ -1,12 +1,12 @@
 package com.online.bus.ticket.reservation.payment.service;
 
-import com.online.bus.ticket.reservation.payment.enums.PaymentStatus;
+import com.online.bus.ticket.reservation.payment.enums.BookingStatus;
 import com.online.bus.ticket.reservation.payment.exception.PaymentException;
 import com.online.bus.ticket.reservation.payment.model.Payment;
 import com.online.bus.ticket.reservation.payment.repository.PaymentRepository;
 import com.online.bus.ticket.reservation.payment.request.PaymentRequest;
-import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -14,16 +14,16 @@ import java.util.Objects;
 
 @Slf4j
 @Service
-@AllArgsConstructor
 public class PaymentService {
 
-    private final PaymentRepository paymentRepository;
+    @Autowired
+    private PaymentRepository paymentRepository;
 
     public Payment createPayment(PaymentRequest paymentRequest){
         Payment payment = new Payment();
-        payment.setBookingDetailsId(paymentRequest.getBookingDetailsId());
+        payment.setBookingId(paymentRequest.getBookingId());
         payment.setAmount(paymentRequest.getAmount());
-        payment.setPaymentStatus(PaymentStatus.findByName(paymentRequest.getPaymentStatus()).name());
+        payment.setPaymentStatus(BookingStatus.findByName(paymentRequest.getPaymentStatus()).name());
         payment.setPaymentDateTime(paymentRequest.getPaymentDateTime());
         return paymentRepository.save(payment);
     }
@@ -41,9 +41,9 @@ public class PaymentService {
         if (Objects.isNull(payment)){
             throw new PaymentException("Payment is not present and unable to update");
         }
-        payment.setBookingDetailsId(paymentRequest.getBookingDetailsId());
+        payment.setBookingId(paymentRequest.getBookingId());
         payment.setAmount(paymentRequest.getAmount());
-        payment.setPaymentStatus(PaymentStatus.findByName(paymentRequest.getPaymentStatus()).name());
+        payment.setPaymentStatus(BookingStatus.findByName(paymentRequest.getPaymentStatus()).name());
         payment.setPaymentDateTime(paymentRequest.getPaymentDateTime());
         return paymentRepository.save(payment);
     }
@@ -59,8 +59,8 @@ public class PaymentService {
         return (List<Payment>) paymentRepository.findAll();
     }
 
-    public Payment getPaymentByBookingDetailsId(long bookingDetailsId) {
-        Payment payment = paymentRepository.findByBookingDetailsId(bookingDetailsId).orElse(null);
+    public Payment getPaymentByBookingId(long bookingId) {
+        Payment payment = paymentRepository.findByBookingId(bookingId).orElse(null);
         if (Objects.isNull(payment)){
             throw new PaymentException("Payment not present");
         }

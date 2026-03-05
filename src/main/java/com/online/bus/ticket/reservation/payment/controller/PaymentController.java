@@ -4,20 +4,21 @@ import com.online.bus.ticket.reservation.payment.model.Payment;
 import com.online.bus.ticket.reservation.payment.request.PaymentRequest;
 import com.online.bus.ticket.reservation.payment.service.PaymentService;
 import com.online.bus.ticket.reservation.payment.validator.PaymentValidator;
-import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
-@AllArgsConstructor
 @Slf4j
 @RequestMapping("/api/payments")
 @RestController
 public class PaymentController {
 
-    private final PaymentValidator paymentValidator;
-    private final PaymentService paymentService;
+    @Autowired
+    private PaymentValidator paymentValidator;
+    @Autowired
+    private PaymentService paymentService;
 
     @PostMapping
     public Payment createPayment(@RequestBody PaymentRequest paymentRequest) {
@@ -54,10 +55,10 @@ public class PaymentController {
         paymentService.deletePayment(paymentId);
     }
 
-    @GetMapping("/booking-details-id/{bookingDetailsId}")
-    public Payment getPaymentByBookingDetailsId(@PathVariable("bookingDetailsId") long bookingDetailsId) {
-        log.info("Inside PaymentController getPaymentByBookingDetailsId Method with bookingDetailsId: {}", bookingDetailsId);
-        paymentValidator.validateBookingDetailsId(bookingDetailsId);
-        return paymentService.getPaymentByBookingDetailsId(bookingDetailsId);
+    @GetMapping("/booking-details-id/{bookingId}")
+    public Payment getPaymentByBookingId(@PathVariable("bookingId") long bookingId) {
+        log.info("Inside PaymentController getPaymentByBookingId Method with bookingId: {}", bookingId);
+        paymentValidator.validateBookingId(bookingId);
+        return paymentService.getPaymentByBookingId(bookingId);
     }
 }
