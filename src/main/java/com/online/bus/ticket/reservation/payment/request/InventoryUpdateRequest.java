@@ -4,6 +4,7 @@ import lombok.Data;
 
 @Data
 public class InventoryUpdateRequest {
+    private long bookingId;
     private long busRouteNum;
     private int noOfSeatsBooked;
 }

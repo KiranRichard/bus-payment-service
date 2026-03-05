@@ -40,6 +40,7 @@ public class PaymentService {
         InventoryUpdateRequest inventoryUpdateRequest = new InventoryUpdateRequest();
         inventoryUpdateRequest.setBusRouteNum(savedPayment.getBusRouteNum());
         inventoryUpdateRequest.setNoOfSeatsBooked(savedPayment.getNoOfSeatsBooked());
+        inventoryUpdateRequest.setBookingId(paymentRequest.getBookingId());
         String jsonMessage = objectMapper.writeValueAsString(inventoryUpdateRequest);
         producerService.sendMessageForUpdatePayments(jsonMessage);
         return savedPayment;
