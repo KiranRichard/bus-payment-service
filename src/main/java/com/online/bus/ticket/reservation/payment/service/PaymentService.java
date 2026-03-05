@@ -1,9 +1,13 @@
 package com.online.bus.ticket.reservation.payment.service;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.online.bus.ticket.reservation.payment.enums.BookingStatus;
 import com.online.bus.ticket.reservation.payment.exception.PaymentException;
+import com.online.bus.ticket.reservation.payment.kafka.ProducerService;
 import com.online.bus.ticket.reservation.payment.model.Payment;
 import com.online.bus.ticket.reservation.payment.repository.PaymentRepository;
+import com.online.bus.ticket.reservation.payment.request.InventoryUpdateRequest;
 import com.online.bus.ticket.reservation.payment.request.PaymentRequest;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,14 +22,27 @@ public class PaymentService {
 
     @Autowired
     private PaymentRepository paymentRepository;
+    @Autowired
+    private ProducerService producerService;
+    @Autowired
+    private ObjectMapper objectMapper;
 
-    public Payment createPayment(PaymentRequest paymentRequest){
+    public Payment createPayment(PaymentRequest paymentRequest) throws JsonProcessingException {
         Payment payment = new Payment();
         payment.setBookingId(paymentRequest.getBookingId());
         payment.setAmount(paymentRequest.getAmount());
         payment.setPaymentStatus(BookingStatus.findByName(paymentRequest.getPaymentStatus()).name());
+        payment.setBusRouteNum(paymentRequest.getBusRouteNum());
+        payment.setNoOfSeatsBooked(paymentRequest.getNoOfSeatsBooked());
         payment.setPaymentDateTime(paymentRequest.getPaymentDateTime());
-        return paymentRepository.save(payment);
+
+        Payment savedPayment = paymentRepository.save(payment);
+        InventoryUpdateRequest inventoryUpdateRequest = new InventoryUpdateRequest();
+        inventoryUpdateRequest.setBusRouteNum(savedPayment.getBusRouteNum());
+        inventoryUpdateRequest.setNoOfSeatsBooked(savedPayment.getNoOfSeatsBooked());
+        String jsonMessage = objectMapper.writeValueAsString(inventoryUpdateRequest);
+        producerService.sendMessageForUpdatePayments(jsonMessage);
+        return savedPayment;
     }
 
     public Payment getPayment(long paymentId) {
@@ -44,6 +61,8 @@ public class PaymentService {
         payment.setBookingId(paymentRequest.getBookingId());
         payment.setAmount(paymentRequest.getAmount());
         payment.setPaymentStatus(BookingStatus.findByName(paymentRequest.getPaymentStatus()).name());
+        payment.setBusRouteNum(paymentRequest.getBusRouteNum());
+        payment.setNoOfSeatsBooked(payment.getNoOfSeatsBooked());
         payment.setPaymentDateTime(paymentRequest.getPaymentDateTime());
         return paymentRepository.save(payment);
     }

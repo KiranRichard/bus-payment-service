@@ -8,6 +8,8 @@ import java.time.LocalDateTime;
 public class PaymentRequest {
 
     private long bookingId;
+    private long busRouteNum;
+    private int noOfSeatsBooked;
     private double amount;
     private String paymentStatus;
     private LocalDateTime paymentDateTime;

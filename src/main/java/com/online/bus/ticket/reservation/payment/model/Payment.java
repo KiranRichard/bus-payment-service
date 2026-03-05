@@ -18,6 +18,8 @@ public class Payment {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private long paymentId;
     private long bookingId;
+    private long busRouteNum;
+    private int noOfSeatsBooked;
     private double amount;
     private String paymentStatus;
     private LocalDateTime paymentDateTime;

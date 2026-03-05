@@ -24,6 +24,11 @@ public class PaymentValidator {
             throw new RequiredFieldsMissingException("Invalid booking id is null in payment request");
         }
 
+        if(paymentRequest.getBusRouteNum()<=0) {
+            log.info("[Error]: Invalid bus route number is null in payment request");
+            throw new RequiredFieldsMissingException("Invalid bus route number is null in payment request");
+        }
+
         if(paymentRequest.getAmount()<=0) {
             log.info("[Error]: Invalid amount is null in payment request");
             throw new RequiredFieldsMissingException("Invalid amount is null in payment request");

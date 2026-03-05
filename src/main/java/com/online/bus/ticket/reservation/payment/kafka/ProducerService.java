@@ -12,8 +12,8 @@ public class ProducerService {
     @Autowired
     private KafkaTemplate<String, String> kafkaTemplate;
 
-    public void sendMessageForInsertPayments(String message) {
-        kafkaTemplate.send("payment-topic-insert", message);
+    public void sendMessageForUpdatePayments(String message) {
+        kafkaTemplate.send("payment-topic-update", message);
     }
 
     public void sendMessageForDeletePayments(String message) {

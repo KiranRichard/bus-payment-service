@@ -1,5 +1,6 @@
 package com.online.bus.ticket.reservation.payment.controller;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.online.bus.ticket.reservation.payment.model.Payment;
 import com.online.bus.ticket.reservation.payment.request.PaymentRequest;
 import com.online.bus.ticket.reservation.payment.service.PaymentService;
@@ -21,7 +22,7 @@ public class PaymentController {
     private PaymentService paymentService;
 
     @PostMapping
-    public Payment createPayment(@RequestBody PaymentRequest paymentRequest) {
+    public Payment createPayment(@RequestBody PaymentRequest paymentRequest) throws JsonProcessingException {
         log.info("Inside PaymentController createPayment Method");
         paymentValidator.validatePayment(paymentRequest);
         return paymentService.createPayment(paymentRequest);
