@@ -22,9 +22,11 @@ public class Payment {
     private int noOfSeatsBooked;
     private double amount;
     private String paymentStatus;
+    private String cancelledReason;
     private LocalDateTime paymentDateTime;
     @CreationTimestamp
     private LocalDateTime createdDateTime;
     @UpdateTimestamp
     private LocalDateTime updatedDateTime;
+    private LocalDateTime refundedDateTime;
 }

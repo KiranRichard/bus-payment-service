@@ -9,6 +9,7 @@ import com.online.bus.ticket.reservation.payment.model.Payment;
 import com.online.bus.ticket.reservation.payment.repository.PaymentRepository;
 import com.online.bus.ticket.reservation.payment.request.InventoryUpdateRequest;
 import com.online.bus.ticket.reservation.payment.request.PaymentRequest;
+import com.online.bus.ticket.reservation.payment.request.RefundRequest;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -85,5 +86,24 @@ public class PaymentService {
             throw new PaymentException("Payment not present");
         }
         return payment;
+    }
+
+    public Payment performRefunds(RefundRequest refundRequest) throws JsonProcessingException {
+        Payment payment = paymentRepository.findByBookingId(refundRequest.getBookingId()).orElse(null);
+        if (Objects.isNull(payment)){
+            throw new PaymentException("Payment not present for refunds");
+        }
+        payment.setCancelledReason(refundRequest.getReasonForCancellation());
+        payment.setRefundedDateTime(refundRequest.getRefundedDateTime());
+        payment.setPaymentStatus(BookingStatus.REFUNDED.name());
+        Payment refundedPayment = paymentRepository.save(payment);
+
+        InventoryUpdateRequest inventoryUpdateRequest = new InventoryUpdateRequest();
+        inventoryUpdateRequest.setBusRouteNum(refundRequest.getBusRouteNum());
+        inventoryUpdateRequest.setNoOfSeatsBooked(refundedPayment.getNoOfSeatsBooked());
+        inventoryUpdateRequest.setBookingId(refundRequest.getBookingId());
+        String jsonMessage = objectMapper.writeValueAsString(inventoryUpdateRequest);
+        producerService.sendMessageForDeletePayments(jsonMessage);
+        return refundedPayment;
     }
 }

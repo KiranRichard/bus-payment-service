@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.online.bus.ticket.reservation.payment.enums.BookingStatus;
 import com.online.bus.ticket.reservation.payment.model.Payment;
 import com.online.bus.ticket.reservation.payment.request.PaymentRequest;
+import com.online.bus.ticket.reservation.payment.request.RefundRequest;
 import com.online.bus.ticket.reservation.payment.service.PaymentService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -37,7 +38,14 @@ public class ConsumerService {
     }
 
     @KafkaListener(topics = "booking-topic-delete", groupId = "admin-group")
-    public void consumeMessageForDeletePayments(String message) {
+    public void consumeMessageForDeletePayments(String message) throws JsonProcessingException {
         System.out.println("Received: " + message);
+
+        RefundRequest refundRequest = objectMapper.readValue(message, RefundRequest.class);
+        Payment refundedPayment = paymentService.performRefunds(refundRequest);
+        if (Objects.isNull(refundedPayment)) {
+            log.info("[Error] Message unable to process");
+        }
+        log.info("The message received: {} has been processed sucessfully.", message);
     }
 }
