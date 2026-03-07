@@ -7,6 +7,7 @@ import com.online.bus.ticket.reservation.payment.exception.PaymentException;
 import com.online.bus.ticket.reservation.payment.kafka.ProducerService;
 import com.online.bus.ticket.reservation.payment.model.Payment;
 import com.online.bus.ticket.reservation.payment.repository.PaymentRepository;
+import com.online.bus.ticket.reservation.payment.request.BookingUpdateRequest;
 import com.online.bus.ticket.reservation.payment.request.InventoryUpdateRequest;
 import com.online.bus.ticket.reservation.payment.request.PaymentRequest;
 import com.online.bus.ticket.reservation.payment.request.RefundRequest;
@@ -29,22 +30,32 @@ public class PaymentService {
     private ObjectMapper objectMapper;
 
     public Payment createPayment(PaymentRequest paymentRequest) throws JsonProcessingException {
-        Payment payment = new Payment();
-        payment.setBookingId(paymentRequest.getBookingId());
-        payment.setAmount(paymentRequest.getAmount());
-        payment.setPaymentStatus(BookingStatus.findByName(paymentRequest.getPaymentStatus()).name());
-        payment.setBusRouteNum(paymentRequest.getBusRouteNum());
-        payment.setNoOfSeatsBooked(paymentRequest.getNoOfSeatsBooked());
-        payment.setPaymentDateTime(paymentRequest.getPaymentDateTime());
+        if (paymentRequest.getAmount()>2000) {
+            //Added intentionally to cover negative scenario
+            BookingUpdateRequest bookingUpdateRequest = new BookingUpdateRequest();
+            bookingUpdateRequest.setBookingId(paymentRequest.getBookingId());
+            String jsonMessage = objectMapper.writeValueAsString(bookingUpdateRequest);
+            producerService.sendMessageForRejectPayments(jsonMessage);
+            return null;
+        }
+        else {
+            Payment payment = new Payment();
+            payment.setBookingId(paymentRequest.getBookingId());
+            payment.setAmount(paymentRequest.getAmount());
+            payment.setPaymentStatus(BookingStatus.findByName(paymentRequest.getPaymentStatus()).name());
+            payment.setBusRouteNum(paymentRequest.getBusRouteNum());
+            payment.setNoOfSeatsBooked(paymentRequest.getNoOfSeatsBooked());
+            payment.setPaymentDateTime(paymentRequest.getPaymentDateTime());
 
-        Payment savedPayment = paymentRepository.save(payment);
-        InventoryUpdateRequest inventoryUpdateRequest = new InventoryUpdateRequest();
-        inventoryUpdateRequest.setBusRouteNum(savedPayment.getBusRouteNum());
-        inventoryUpdateRequest.setNoOfSeatsBooked(savedPayment.getNoOfSeatsBooked());
-        inventoryUpdateRequest.setBookingId(paymentRequest.getBookingId());
-        String jsonMessage = objectMapper.writeValueAsString(inventoryUpdateRequest);
-        producerService.sendMessageForUpdatePayments(jsonMessage);
-        return savedPayment;
+            Payment savedPayment = paymentRepository.save(payment);
+            InventoryUpdateRequest inventoryUpdateRequest = new InventoryUpdateRequest();
+            inventoryUpdateRequest.setBusRouteNum(savedPayment.getBusRouteNum());
+            inventoryUpdateRequest.setNoOfSeatsBooked(savedPayment.getNoOfSeatsBooked());
+            inventoryUpdateRequest.setBookingId(paymentRequest.getBookingId());
+            String jsonMessage = objectMapper.writeValueAsString(inventoryUpdateRequest);
+            producerService.sendMessageForUpdatePayments(jsonMessage);
+            return savedPayment;
+        }
     }
 
     public Payment getPayment(long paymentId) {

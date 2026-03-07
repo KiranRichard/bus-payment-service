@@ -19,4 +19,8 @@ public class ProducerService {
     public void sendMessageForDeletePayments(String message) {
         kafkaTemplate.send("payment-topic-delete", message);
     }
+
+    public void sendMessageForRejectPayments(String message) {
+        kafkaTemplate.send("payment-topic-reject", message);
+    }
 }
